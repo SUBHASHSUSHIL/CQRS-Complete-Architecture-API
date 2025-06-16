@@ -28,6 +28,6 @@ namespace BookManagement.WebAPI.Application.Commands.Handlers
                 IsDeleted = false
             };
             return await _authorRepository.CreateAuthorAsync(author);
-        }
+        } 
     }
 }
