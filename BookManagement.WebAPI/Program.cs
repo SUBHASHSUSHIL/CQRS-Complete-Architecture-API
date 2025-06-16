@@ -1,4 +1,6 @@
+using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Data;
+using BookManagement.WebAPI.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 
 var app = builder.Build();
 
