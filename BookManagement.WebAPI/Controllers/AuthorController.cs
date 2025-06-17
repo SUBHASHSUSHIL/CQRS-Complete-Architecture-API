@@ -55,7 +55,7 @@ namespace BookManagement.WebAPI.Controllers
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(Guid id)
-        {
+        {               
             var command = new DeleteAuthorCommand(id);
             var result = await _mediator.Send(command);
             if (result == Guid.Empty)

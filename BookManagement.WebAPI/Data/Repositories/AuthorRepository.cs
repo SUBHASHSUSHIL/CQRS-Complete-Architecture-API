@@ -1,6 +1,7 @@
 ﻿using BookManagement.WebAPI.Application.DTOs;
 using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -38,9 +39,9 @@ namespace BookManagement.WebAPI.Data.Repositories
             var filterData = await _applicationDbContext.Authors.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (filterData == null)
             {
-                return null; // or throw an exception if preferred
+                return null;
             }
-            filterData.IsDeleted = true; // Mark as deleted instead of removing from DB
+            filterData.IsDeleted = true; 
             _applicationDbContext.Authors.Update(filterData);
             await _applicationDbContext.SaveChangesAsync();
             return filterData;
@@ -63,7 +64,7 @@ namespace BookManagement.WebAPI.Data.Repositories
             var existingAuthor = await _applicationDbContext.Authors.FindAsync(author.Id);
             if (existingAuthor == null)
             {
-                return null; // or throw an exception if preferred
+                return null;
             }
             existingAuthor.AuthorName = author.AuthorName;
             existingAuthor.IsDeleted = author.IsDeleted;

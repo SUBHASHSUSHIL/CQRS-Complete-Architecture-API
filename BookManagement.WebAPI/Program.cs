@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 var app = builder.Build();
 
