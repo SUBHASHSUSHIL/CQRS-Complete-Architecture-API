@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,21 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<Book> AddBookAsync(Book book)
+        public async Task<Book> AddBookAsync(Book book)
         {
-            throw new NotImplementedException();
+            var newBook = new Book
+            {
+                Id = Guid.NewGuid(),
+                Title = book.Title,
+                AuthorId = book.AuthorId,
+                Description = book.Description,
+                Cover = book.Cover,
+                IsDeleted = book.IsDeleted,
+                PublishYear = book.PublishYear
+            };
+            await _applicationDbContext.Books.AddAsync(newBook);
+            await _applicationDbContext.SaveChangesAsync();
+            return newBook;
         }
 
         public Task DeleteBookAsync(Guid id)
@@ -27,19 +40,40 @@ namespace BookManagement.WebAPI.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<List<Book>> GetBookAllAsync()
+        public async Task<List<Book>> GetBookAllAsync()
         {
-            throw new NotImplementedException();
+            var books = await _applicationDbContext.Books
+                .Where(b => !b.IsDeleted)
+                .ToListAsync();
+            return books;
         }
 
-        public Task<Book> GetBookByIdAsync(Guid id)
+        public async Task<Book> GetBookByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var book = await _applicationDbContext.Books
+                .Where(b => b.Id == id && !b.IsDeleted)
+                .FirstOrDefaultAsync();
+            return book ?? throw new KeyNotFoundException($"Book with ID {id} not found.");
         }
 
-        public Task<Book> UpdateBookAsync(Book book)
+        public async Task<Book> UpdateBookAsync(Book book)
         {
-            throw new NotImplementedException();
+            var existingBook = await _applicationDbContext.Books
+                .Where(b => b.Id == book.Id && !b.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (existingBook == null)
+                {
+                throw new KeyNotFoundException($"Book with ID {book.Id} not found.");
+            }
+            existingBook.Title = book.Title;
+            existingBook.Description = book.Description;
+            existingBook.Cover = book.Cover;
+            existingBook.AuthorId = book.AuthorId;
+            existingBook.PublishYear = book.PublishYear;
+            existingBook.IsDeleted = book.IsDeleted;
+            _applicationDbContext.Books.Update(existingBook);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingBook;
         }
     }
 }

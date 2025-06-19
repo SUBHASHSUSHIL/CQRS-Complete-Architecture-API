@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,64 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<Genre> AddGenreAsync(Genre genre)
+        public async Task<Genre> AddGenreAsync(Genre genre)
         {
-            throw new NotImplementedException();
+            var newGenre = new Genre
+            {
+                Id = Guid.NewGuid(),
+                GenreName = genre.GenreName,
+                IsDeleted = genre.IsDeleted
+            };
+            await _applicationDbContext.Genres.AddAsync(newGenre);
+            await _applicationDbContext.SaveChangesAsync();
+            return newGenre;
         }
 
-        public Task<Genre> DeleteGenreAsync(Guid id)
+        public async Task<Genre> DeleteGenreAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var genre = await _applicationDbContext.Genres
+                .Where(g => g.Id == id && !g.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (genre == null)
+                {
+                throw new KeyNotFoundException($"Genre with ID {id} not found.");
+            }
+            genre.IsDeleted = true;
+            _applicationDbContext.Genres.Update(genre);
+            await _applicationDbContext.SaveChangesAsync();
+            return genre;
         }
 
-        public Task<List<Genre>> GetAllGenreAsync()
+        public async Task<List<Genre>> GetAllGenreAsync()
         {
-            throw new NotImplementedException();
+            var genres = await _applicationDbContext.Genres
+                .Where(g => !g.IsDeleted)
+                .ToListAsync();
+            return genres;
         }
 
-        public Task<Genre> GetGenreByIdAsync(Guid id)
+        public async Task<Genre> GetGenreByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var genre = await _applicationDbContext.Genres
+                .Where(g => g.Id == id && !g.IsDeleted)
+                .FirstOrDefaultAsync();
+            return genre ?? throw new KeyNotFoundException($"Genre with ID {id} not found.");
         }
 
-        public Task<Genre> UpdateGenreAsync(Genre genre)
+        public async Task<Genre> UpdateGenreAsync(Genre genre)
         {
-            throw new NotImplementedException();
+            var existingGenre = await _applicationDbContext.Genres
+                .Where(g => g.Id == genre.Id && !g.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (existingGenre == null)
+                {
+                throw new KeyNotFoundException($"Genre with ID {genre.Id} not found.");
+            }
+            existingGenre.GenreName = genre.GenreName;
+            existingGenre.IsDeleted = genre.IsDeleted;
+            _applicationDbContext.Genres.Update(existingGenre);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingGenre;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +28,33 @@ namespace BookManagement.WebAPI.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<List<RefreshToken>> GetAllRefreshTokenAsync()
+        //public async Task<RefreshToken> DeleteRefreshTokenAsync(Guid id)
+        //{
+        //    var refreshToken = await _applicationDbContext.RefreshTokens
+        //        .Where(rt => rt.Id == id)
+        //        .FirstOrDefaultAsync();
+        //    if (refreshToken == null)
+        //        {
+        //        throw new KeyNotFoundException($"Refresh token with ID {id} not found.");
+        //    }
+        //    refreshToken.IsDeleted = true;
+        //    _applicationDbContext.RefreshTokens.Update(refreshToken);
+        //    await _applicationDbContext.SaveChangesAsync();
+        //    return refreshToken;
+        //}
+
+        public async Task<List<RefreshToken>> GetAllRefreshTokenAsync()
         {
-            throw new NotImplementedException();
+            var refreshTokens = await _applicationDbContext.RefreshTokens.ToListAsync();
+            return refreshTokens;
         }
 
-        public Task<RefreshToken> GetRefreshTokenByIdAsync(Guid id)
+        public async Task<RefreshToken> GetRefreshTokenByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var refreshToken = await _applicationDbContext.RefreshTokens
+                .Where(rt => rt.Id == id)
+                .FirstOrDefaultAsync();
+            return refreshToken ?? throw new KeyNotFoundException($"Refresh token with ID {id} not found.");
         }
 
         public Task<RefreshToken> UpdateRefreshTokenAsync(RefreshToken refreshToken)

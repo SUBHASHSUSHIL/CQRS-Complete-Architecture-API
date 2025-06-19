@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +28,16 @@ namespace BookManagement.WebAPI.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<List<User>> GetAllUserAsync()
+        public async Task<List<User>> GetAllUserAsync()
         {
-            throw new NotImplementedException();
+            var user = await _applicationDbContext.Users.ToListAsync();
+            return user;
         }
 
-        public Task<User> GetUserByIdAsync(Guid id)
+        public async Task<User> GetUserByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var user = await _applicationDbContext.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
+            return user ?? throw new KeyNotFoundException($"User with ID {id} not found.");
         }
 
         public Task<User> UpdateUserAsync(User user)

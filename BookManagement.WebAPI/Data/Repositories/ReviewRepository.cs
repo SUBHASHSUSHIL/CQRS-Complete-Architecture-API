@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,70 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<Review> AddReviewAsync(Review review)
+        public async Task<Review> AddReviewAsync(Review review)
         {
-            throw new NotImplementedException();
+            var newReview = new Review
+            {
+                Id = Guid.NewGuid(),
+                BookId = review.BookId,
+                UserId = review.UserId,
+                ReviewContent = review.ReviewContent,
+                AddedOn = DateTime.Now,
+                IsDeleted = review.IsDeleted
+            };
+            await _applicationDbContext.Reviews.AddAsync(newReview);
+            await _applicationDbContext.SaveChangesAsync();
+            return newReview;
         }
 
-        public Task<Review> DeleteReviewAsync(Guid id)
+        public async Task<Review> DeleteReviewAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var review = await _applicationDbContext.Reviews
+                .Where(r => r.Id == id && !r.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (review == null)
+            {   
+                throw new KeyNotFoundException($"Review with ID {id} not found.");
+            }
+            review.IsDeleted = true;
+            _applicationDbContext.Reviews.Update(review);
+            await _applicationDbContext.SaveChangesAsync();
+            return review;
         }
 
-        public Task<List<Review>> GetAllReviewAsync()
+        public async Task<List<Review>> GetAllReviewAsync()
         {
-            throw new NotImplementedException();
+            var reviews = await _applicationDbContext.Reviews
+                .Where(r => !r.IsDeleted)
+                .ToListAsync();
+            return reviews;
         }
 
-        public Task<Review> GetReviewByIdAsync(Guid id)
+        public async Task<Review> GetReviewByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var review = await _applicationDbContext.Reviews
+                .Where(r => r.Id == id && !r.IsDeleted)
+                .FirstOrDefaultAsync();
+            return review ?? throw new KeyNotFoundException($"Review with ID {id} not found.");
         }
 
-        public Task<Review> UpdateReviewAsync(Review review)
+        public async Task<Review> UpdateReviewAsync(Review review)
         {
-            throw new NotImplementedException();
+            var existingReview = await _applicationDbContext.Reviews
+                .Where(r => r.Id == review.Id && !r.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (existingReview == null)
+                {
+                throw new KeyNotFoundException($"Review with ID {review.Id} not found.");
+            }
+            existingReview.BookId = review.BookId;
+            existingReview.UserId = review.UserId;
+            existingReview.ReviewContent = review.ReviewContent;
+            existingReview.AddedOn = review.AddedOn;
+            existingReview.IsDeleted = review.IsDeleted;
+            _applicationDbContext.Reviews.Update(existingReview);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingReview;
         }
     }
 }

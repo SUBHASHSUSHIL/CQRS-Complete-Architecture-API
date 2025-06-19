@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,66 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<Favorite> AddAsync(Favorite favorite)
+        public async Task<Favorite> AddAsync(Favorite favorite)
         {
-            throw new NotImplementedException();
+            var newFavorite = new Favorite
+            {
+                Id = Guid.NewGuid(),
+                UserId = favorite.UserId,
+                BookId = favorite.BookId,
+                IsDeleted = favorite.IsDeleted
+            };
+            await _applicationDbContext.Favorites.AddAsync(newFavorite);
+            await _applicationDbContext.SaveChangesAsync();
+            return newFavorite;
         }
 
-        public Task<Favorite> DeleteAsync(Guid id)
+        public async Task<Favorite> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var favorite = await _applicationDbContext.Favorites
+                .Where(f => f.Id == id && !f.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (favorite == null)
+                {
+                throw new KeyNotFoundException($"Favorite with ID {id} not found.");
+            }
+            favorite.IsDeleted = true;
+            _applicationDbContext.Favorites.Update(favorite);
+            await _applicationDbContext.SaveChangesAsync();
+            return favorite;
         }
 
-        public Task<List<Favorite>> GetAllFavoriteAsync()
+        public async Task<List<Favorite>> GetAllFavoriteAsync()
         {
-            throw new NotImplementedException();
+            var favorites = await _applicationDbContext.Favorites
+                .Where(f => !f.IsDeleted)
+                .ToListAsync();
+            return favorites;
         }
 
-        public Task<Favorite> GetFavoriteByIdAsync(Guid id)
+        public async Task<Favorite> GetFavoriteByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var favorite = await _applicationDbContext.Favorites
+                .Where(f => f.Id == id && !f.IsDeleted)
+                .FirstOrDefaultAsync();
+            return favorite ?? throw new KeyNotFoundException($"Favorite with ID {id} not found.");
         }
 
-        public Task<Favorite> UpdateAsync(Favorite favorite)
+        public async Task<Favorite> UpdateAsync(Favorite favorite)
         {
-            throw new NotImplementedException();
+            var existingFavorite = await _applicationDbContext.Favorites
+                .Where(f => f.Id == favorite.Id && !f.IsDeleted)
+                .FirstOrDefaultAsync();
+            if (existingFavorite == null)
+                {
+                throw new KeyNotFoundException($"Favorite with ID {favorite.Id} not found.");
+            }
+            existingFavorite.UserId = favorite.UserId;
+            existingFavorite.BookId = favorite.BookId;
+            existingFavorite.IsDeleted = favorite.IsDeleted;
+            _applicationDbContext.Favorites.Update(existingFavorite);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingFavorite;
         }
     }
 }
