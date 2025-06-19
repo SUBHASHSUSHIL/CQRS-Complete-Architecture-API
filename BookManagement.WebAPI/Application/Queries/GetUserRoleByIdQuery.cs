@@ -8,8 +8,13 @@ using System.Threading.Tasks;
 
 namespace BookManagement.WebAPI.Application.Queries
 {
-    public class GetUserRoleByIdQuery : IRequest<UserRole>
+    public class GetUserRoleByIdQuery : IRequest<UserRole>, IBaseRequest
     {
         public Guid Id { get; }
+
+        public GetUserRoleByIdQuery(Guid id)
+        {
+            Id = id;
+        }
     }
 }

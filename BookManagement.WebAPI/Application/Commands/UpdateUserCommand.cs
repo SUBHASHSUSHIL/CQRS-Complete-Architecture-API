@@ -10,6 +10,8 @@ namespace BookManagement.WebAPI.Application.Commands
 {
     public class UpdateUserCommand : IRequest<User>
     {
+        private object isDeleted;
+
         public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -32,6 +34,21 @@ namespace BookManagement.WebAPI.Application.Commands
             Password = password;
             Phone = phone;
             Photo = photo;
+        }
+
+        public UpdateUserCommand(Guid id, string userName, string email, object isDeleted)
+        {
+            Id = id;
+            UserName = userName;
+            Email = email;
+            this.isDeleted = isDeleted;
+        }
+
+        public UpdateUserCommand(Guid id, string userName, string email)
+        {
+            Id = id;
+            UserName = userName;
+            Email = email;
         }
     }
 }

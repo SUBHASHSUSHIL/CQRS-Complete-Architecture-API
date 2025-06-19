@@ -21,5 +21,12 @@ namespace BookManagement.WebAPI.Application.Commands
             ReviewContent = reviewContent;
             Rating = rating;
         }
+
+        public CreateReviewCommand(Guid bookId, Guid userId, string reviewContent)
+        {
+            BookId = bookId;
+            UserId = userId;
+            ReviewContent = reviewContent;
+        }
     }
 }

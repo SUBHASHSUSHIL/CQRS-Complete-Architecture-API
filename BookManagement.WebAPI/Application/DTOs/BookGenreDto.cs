@@ -20,6 +20,7 @@ namespace BookManagement.WebAPI.Application.DTOs
 
     public class UpdateBookGenreDto
     {
+        public Guid Id { get; set; }
         public Guid BookId { get; set; }
         public Guid GenreId { get; set; }
         public bool IsDeleted { get; set; }

@@ -10,6 +10,11 @@ namespace BookManagement.WebAPI.Application.Queries
 {
     public class GetUserBookByIdQuery : IRequest<UserBook>
     {
+        public GetUserBookByIdQuery(Guid id)
+        {
+            Id = id;
+        }
+
         public Guid Id { get; set; }
     }
 }

@@ -17,9 +17,6 @@ namespace BookManagement.WebAPI.Application.DTOs
         public Guid UserId { get; set; }
         public Guid BookId { get; set; }
         public string ReviewContent { get; set; }
-        public DateTime AddedOn { get; set; } = DateTime.UtcNow;
-        public DateTime? UpdatedOn { get; set; } = null;
-        public bool IsDeleted { get; set; }
     }
 
     public class UpdateReviewDto

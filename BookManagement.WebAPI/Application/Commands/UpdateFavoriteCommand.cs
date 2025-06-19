@@ -13,11 +13,13 @@ namespace BookManagement.WebAPI.Application.Commands
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid BookId { get; set; }
-        public UpdateFavoriteCommand(Guid userId, Guid bookId, Guid id)
+        public bool IsDeleted { get; set; } = false;
+        public UpdateFavoriteCommand(Guid id, Guid userId, Guid bookId, bool isDeleted)
         {
+            Id = id;
             UserId = userId;
             BookId = bookId;
-            Id = id;
+            IsDeleted = isDeleted;
         }
     }
 }

@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 
 namespace BookManagement.WebAPI.Application.Commands
 {
-    public class UpdateUserRoleCommand : IRequest<UserRole>
+    public class UpdateUserRoleCommand : IRequest<UserRole>, IBaseRequest
     {
         public Guid Id { get; set; }
         public Guid RoleId { get; set; }
         public Guid UserId { get; set; }
-        public UpdateUserRoleCommand(Guid id, Guid roleId, Guid userId)
+        public bool IsDeleted { get; set; }
+
+        // Constructor to fix CS1729
+        public UpdateUserRoleCommand(Guid id, Guid userId, Guid roleId, bool isDeleted)
         {
             Id = id;
-            RoleId = roleId;
             UserId = userId;
+            RoleId = roleId;
+            IsDeleted = isDeleted;
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using BookManagement.WebAPI.Application.Commands;
+using BookManagement.WebAPI.Application.DTOs;
+using BookManagement.WebAPI.Application.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +16,62 @@ namespace BookManagement.WebAPI.Controllers
         public UserRoleController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserRoles()
+        {
+            var query = new GetUserRoleListQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserRoleById(Guid id)
+        {
+            var query = new GetUserRoleByIdQuery(id);
+            var result = await _mediator.Send(query);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUserRole([FromBody] CreateUserRoleDto dto)
+        {
+            var command = new CreateUserRoleCommand(dto.UserId, dto.RoleId);
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetUserRoleById), new { id = result.Id }, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateUserRoleDto dto)
+        {
+            if (id != dto.Id)
+            {
+                return BadRequest("ID mismatch.");
+            }
+            var command = new UpdateUserRoleCommand(dto.Id, dto.UserId, dto.RoleId, dto.IsDeleted);
+            var result = await _mediator.Send(command);
+            if (result == null)
+            {
+                return NotFound($"UserRole with ID {dto.Id} not found.");
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserRole(Guid id)
+        {
+            var command = new DeleteUserRoleCommand(id);
+            var result = await _mediator.Send(command);
+            if (result == null)
+            {
+                return NotFound($"UserRole with ID {id} not found.");
+            }
+            return NoContent();
         }
     }
 }

@@ -31,5 +31,11 @@ namespace BookManagement.WebAPI.Application.Commands
             Phone = phone;
             Photo = photo;
         }
+
+        public CreateUserCommand(string userName, string email)
+        {
+            UserName = userName;
+            Email = email;
+        }
     }
 }

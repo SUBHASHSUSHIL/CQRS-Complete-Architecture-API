@@ -12,7 +12,7 @@ namespace BookManagement.WebAPI.Application.Commands
     {
         public Guid Id { get; set; }
         public string GenreName { get; set; }
-        public UpdateGenreCommand(Guid id, string name)
+        public UpdateGenreCommand(Guid id, string name, bool isDeleted)
         {
             Id = id;
             GenreName = name;

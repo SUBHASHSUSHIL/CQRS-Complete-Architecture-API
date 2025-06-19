@@ -14,7 +14,7 @@ namespace BookManagement.WebAPI.Application.Commands
         public Guid UserId { get; set; }
         public Guid BookId { get; set; }
         public string ReviewContent { get; set; }
-        public UpdateReviewCommand(Guid id, Guid userId, Guid bookId, string reviewContent)
+        public UpdateReviewCommand(Guid id, Guid userId, Guid bookId, string reviewContent, bool isDeleted)
         {
             Id = id;
             UserId = userId;

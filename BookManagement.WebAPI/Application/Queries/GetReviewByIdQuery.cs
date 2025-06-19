@@ -10,6 +10,11 @@ namespace BookManagement.WebAPI.Application.Queries
 {
     public class GetReviewByIdQuery : IRequest<Review>
     {
+        public GetReviewByIdQuery(Guid id)
+        {
+            Id = id;
+        }
+
         public Guid Id { get; set; }
     }
 }
