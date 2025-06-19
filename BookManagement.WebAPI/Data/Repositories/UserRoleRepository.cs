@@ -1,5 +1,6 @@
 ﻿using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +18,60 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<UserRole> AddUserRoleAsync(UserRole userRole)
+        public async Task<UserRole> AddUserRoleAsync(UserRole userRole)
         {
-            throw new NotImplementedException();
+            var existingUserRole = await _applicationDbContext.UserRoles
+                .FirstOrDefaultAsync(ur => ur.RoleId == userRole.RoleId && ur.UserId == userRole.UserId);
+            if (existingUserRole != null)
+            {
+                throw new InvalidOperationException("UserRole with the same RoleId and UserId already exists."); 
+            }
+            userRole.Id = Guid.NewGuid();
+            _applicationDbContext.UserRoles.Add(userRole);
+            await _applicationDbContext.SaveChangesAsync();
+            return userRole;
         }
 
-        public Task<UserRole> DeleteUserRoleAsync(Guid id)
+        public async Task<UserRole> DeleteUserRoleAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var userRole = await _applicationDbContext.UserRoles.FindAsync(id);
+            if (userRole == null)
+            {
+                throw new KeyNotFoundException($"UserRole with ID {id} not found.");
+            }
+            userRole.IsDeleted = true;
+            _applicationDbContext.UserRoles.Update(userRole);
+            await _applicationDbContext.SaveChangesAsync();
+            return userRole;
         }
 
-        public Task<List<UserRole>> GetAllUserRoleAsync()
+        public async Task<List<UserRole>> GetAllUserRoleAsync()
         {
-            throw new NotImplementedException();
+            var userRoles = await _applicationDbContext.UserRoles.Where(ur => !ur.IsDeleted).ToListAsync();
+            return userRoles;
         }
 
-        public Task<UserRole> GetUserRoleByIdAsync(Guid id)
+        public async Task<UserRole> GetUserRoleByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var userRole = await _applicationDbContext.UserRoles
+                .Where(ur => ur.Id == id && !ur.IsDeleted)
+                .FirstOrDefaultAsync();
+            return userRole ?? throw new KeyNotFoundException($"UserRole with ID {id} not found.");
         }
 
-        public Task<UserRole> UpdateUserRoleAsync(UserRole userRole)
+        public async Task<UserRole> UpdateUserRoleAsync(UserRole userRole)
         {
-            throw new NotImplementedException();
+            var existingUserRole = await _applicationDbContext.UserRoles.FindAsync(userRole.Id);
+            if (existingUserRole == null)
+            {
+                throw new KeyNotFoundException($"UserRole with ID {userRole.Id} not found.");
+            }
+            existingUserRole.UserId = userRole.UserId;
+            existingUserRole.RoleId = userRole.RoleId;
+            existingUserRole.IsDeleted = userRole.IsDeleted;
+            _applicationDbContext.UserRoles.Update(existingUserRole);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingUserRole;
         }
     }
 }

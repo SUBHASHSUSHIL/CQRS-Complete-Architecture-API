@@ -18,14 +18,30 @@ namespace BookManagement.WebAPI.Data.Repositories
             _applicationDbContext = applicationDbContext;
         }
 
-        public Task<User> AddUserAsync(User user)
+        public async Task<User> AddUserAsync(User user)
         {
-            throw new NotImplementedException();
+            var existingUser = await _applicationDbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == user.Email || u.UserName == user.UserName);
+            if (existingUser != null)
+                {
+                throw new InvalidOperationException("User with the same email or username already exists.");
+            }
+            user.Id = Guid.NewGuid();
+            _applicationDbContext.Users.Add(user);
+            await _applicationDbContext.SaveChangesAsync();
+            return user;
         }
 
-        public Task<User> DeleteUserAsync(Guid id)
+        public async Task<User> DeleteUserAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var user = await _applicationDbContext.Users.FindAsync(id);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {id} not found.");
+            }
+            _applicationDbContext.Users.Remove(user);
+            await _applicationDbContext.SaveChangesAsync();
+            return user;
         }
 
         public async Task<List<User>> GetAllUserAsync()
@@ -40,9 +56,31 @@ namespace BookManagement.WebAPI.Data.Repositories
             return user ?? throw new KeyNotFoundException($"User with ID {id} not found.");
         }
 
-        public Task<User> UpdateUserAsync(User user)
+        public async Task<User> UpdateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            var existingUser = await _applicationDbContext.Users.FindAsync(user.Id);
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException($"User with ID {user.Id} not found.");
+            }
+            existingUser.FirstName = user.FirstName;
+            existingUser.LastName = user.LastName;
+            existingUser.Email = user.Email;
+            existingUser.UserName = user.UserName;
+            existingUser.Phone = user.Phone;
+            existingUser.Photo = user.Photo;
+            existingUser.IsEmailConfirmed = user.IsEmailConfirmed;
+            existingUser.EmailConformationToken = user.EmailConformationToken;
+            existingUser.EmailConfirmationTokenExpiration = user.EmailConfirmationTokenExpiration;
+            existingUser.IsToken = user.IsToken;
+            existingUser.UserRole = user.UserRole;
+            existingUser.Review = user.Review;
+            existingUser.Favorite = user.Favorite;
+            existingUser.UserBook = user.UserBook;
+            existingUser.RefreshTokens = user.RefreshTokens;
+            _applicationDbContext.Users.Update(existingUser);
+            await _applicationDbContext.SaveChangesAsync();
+            return existingUser;
         }
     }
 }
