@@ -21,6 +21,7 @@ namespace BookManagement.WebAPI.Data
         public DbSet<BookGenre> BookGenres { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<BlacklistedToken> blacklistedTokens { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
     }

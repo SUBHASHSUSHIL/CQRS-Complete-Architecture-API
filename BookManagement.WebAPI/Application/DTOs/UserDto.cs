@@ -1,4 +1,5 @@
-﻿using BookManagement.WebAPI.Models;
+﻿using BookManagement.WebAPI.Application.DTOs.Authentication.User;
+using BookManagement.WebAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,9 +9,18 @@ using System.Threading.Tasks;
 
 namespace BookManagement.WebAPI.Application.DTOs
 {
-    public class UserDto
+    public class UserDto : BasicUserDto
     {
-        
+        public Guid UserId { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class BasicUserDto
+    {
+        public string Name { get; set; }
+        public string UserName { get; set; }
+        public string? Phone { get; set; }
+        public byte[]? ProfilePicture { get; set; }
     }
 
     public class CreateUserDto

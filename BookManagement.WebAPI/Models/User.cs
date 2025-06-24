@@ -16,12 +16,17 @@ namespace BookManagement.WebAPI.Models
         public string Email { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string? PasswordHash { get; set; }
         public string? Phone { get; set; }
+        public string? Name { get; set; }
+        public string AuthProvider { get; set; }
+        public string? GoogleId { get; set; }
         public byte[]? Photo { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public string? EmailConformationToken { get; set; }
         public DateTime? EmailConfirmationTokenExpiration { get; set; }
         public bool IsToken { get; set; }
+        public bool IsDeleted { get; set; }
         public IEnumerable<UserRole> UserRole { get; set; }
         public IEnumerable<Review>? Review { get; set; }
         public IEnumerable<Favorite>? Favorite { get; set; }
