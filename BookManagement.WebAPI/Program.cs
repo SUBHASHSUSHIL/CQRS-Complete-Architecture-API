@@ -1,6 +1,8 @@
 using BookManagement.WebAPI.Application.Interfaces;
 using BookManagement.WebAPI.Data;
 using BookManagement.WebAPI.Data.Repositories;
+using BookManagement.WebAPI.Services;
+using BookManagement.WebAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -53,31 +55,31 @@ var builder = WebApplication.CreateBuilder(args);
 
     #region JWT Bearer Settings
 
-    //builder.Services.AddAuthentication(options =>
-    //{
-    //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    //})
-    //    .AddJwtBearer(options =>
-    //    {
-    //        options.SaveToken = true;
-    //        options.RequireHttpsMetadata = false;
-    //        options.TokenValidationParameters = new TokenValidationParameters()
-    //        {
-    //            ValidateIssuerSigningKey = true,
-    //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey"))),
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey"))),
 
-    //            ValidateIssuer = true,
-    //            ValidIssuer = builder.Configuration["JwtSettings:issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer"),
+                ValidateIssuer = true,
+                ValidIssuer = builder.Configuration["JwtSettings:issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer"),
 
-    //            ValidateAudience = true,
-    //            ValidAudience = builder.Configuration["JwtSettings:audience"] ?? throw new ArgumentNullException("JwtSettings:Audience"),
+                ValidateAudience = true,
+                ValidAudience = builder.Configuration["JwtSettings:audience"] ?? throw new ArgumentNullException("JwtSettings:Audience"),
 
-    //            ValidateLifetime = true,
-    //            ClockSkew = TimeSpan.Zero
-    //        };
-    //    });
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+        });
 
     #endregion
 
@@ -94,6 +96,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
     builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IRoleRepository, RoleRepository>();
     builder.Services.AddScoped<IBookRepository, BookRepository>();
     builder.Services.AddScoped<IBookGenreRepository, BookGenreRepository>();
